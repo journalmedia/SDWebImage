@@ -6,6 +6,7 @@
 //  Copyright (c) 2012 Dailymotion. All rights reserved.
 //
 
+#import "SDImageCache.h"
 #import "SDWebImageCompat.h"
 
 #if !__has_feature(objc_arc)
@@ -28,7 +29,7 @@ inline UIImage *SDScaledImageForKey(NSString *key, UIImage *image) {
     }
     else {
         if ([[UIScreen mainScreen] respondsToSelector:@selector(scale)]) {
-            CGFloat scale = [UIScreen mainScreen].scale;
+            CGFloat scale = [SDImageCache sharedImageCache].imageScaleFactor;
             if (key.length >= 8) {
                 NSRange range = [key rangeOfString:@"@2x."];
                 if (range.location != NSNotFound) {
@@ -40,7 +41,7 @@ inline UIImage *SDScaledImageForKey(NSString *key, UIImage *image) {
                     scale = 3.0;
                 }
             }
-
+            
             UIImage *scaledImage = [[UIImage alloc] initWithCGImage:image.CGImage scale:scale orientation:image.imageOrientation];
             image = scaledImage;
         }

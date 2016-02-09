@@ -100,6 +100,7 @@ FOUNDATION_STATIC_INLINE NSUInteger SDCacheCostForImage(UIImage *image) {
 
         // Init default values
         _maxCacheAge = kDefaultCacheMaxCacheAge;
+        _imageScaleFactor = [UIScreen mainScreen].scale;
 
         // Init the memory cache
         _memCache = [[AutoPurgeCache alloc] init];

@@ -73,6 +73,11 @@ typedef void(^SDWebImageCalculateSizeBlock)(NSUInteger fileCount, NSUInteger tot
 @property (assign, nonatomic) NSUInteger maxCacheSize;
 
 /**
+ * The scale of images, 2.0 for retina @2x, 3.0 for @3x.
+ */
+@property (assign, nonatomic) CGFloat imageScaleFactor;
+
+/**
  * Returns global shared cache instance
  *
  * @return SDImageCache global instance
