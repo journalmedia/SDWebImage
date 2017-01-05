@@ -152,6 +152,10 @@
     }
     NSString *key = [self cacheKeyForURL:url];
 
+    if (options & SDWebImageCircularCrop) {
+        key = [key stringByAppendingString:@"(circularCrop)"];
+    }
+    
     operation.cacheOperation = [self.imageCache queryDiskCacheForKey:key done:^(UIImage *image, SDImageCacheType cacheType) {
         if (operation.isCancelled) {
             @synchronized (self.runningOperations) {
