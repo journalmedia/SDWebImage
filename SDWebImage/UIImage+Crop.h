@@ -10,6 +10,10 @@
 
 @interface UIImage (Crop)
 
+/**
+ * Returns a square image with a circular mask applied to it.
+ * Mask is applied from centre of image.
+ */
 - (UIImage *)circularlyCroppedImage;
 
 @end

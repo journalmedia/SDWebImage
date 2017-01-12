@@ -12,25 +12,28 @@
 
 - (UIImage *)circularlyCroppedImage
 {
-    CGFloat imageWidth = self.size.width;
-    CGFloat imageHeight = self.size.height;
+    // Ensure a square aspect ratio for our context
+    CGFloat contextWidth = fmin(self.size.width, self.size.height);
+    CGFloat contextHeight = fmin(self.size.width, self.size.height);
+    CGFloat contextCentreX = contextWidth / 2.0;
+    CGFloat contextCentreY = contextHeight / 2.0;
+    CGFloat border = 0.0;
+    CGFloat arcRadius = (contextWidth / 2.0) - border;
     
-    UIGraphicsBeginImageContextWithOptions(CGSizeMake(imageWidth, imageHeight), NO, self.scale);
+    UIGraphicsBeginImageContextWithOptions(CGSizeMake(contextWidth, contextHeight), NO, self.scale);
+    
     CGContextRef context = UIGraphicsGetCurrentContext();
-    
-    CGFloat imageCentreX = imageWidth / 2.0;
-    CGFloat imageCentreY = imageHeight / 2.0;
-    CGFloat radius = fmin(imageWidth, imageHeight) / 2.0;
-    
     CGContextBeginPath(context);
-    CGContextAddArc(context, imageCentreX, imageCentreY, radius, 0, 2*M_PI, 0);
+    CGContextAddArc(context, contextCentreX, contextCentreY, arcRadius, 0, 2*M_PI, 0);
     CGContextClosePath(context);
     CGContextClip(context);
     
-    CGRect myRect = CGRectMake(0, 0, imageWidth, imageHeight);
-    [self drawInRect:myRect];
+    // Draw centre of image into graphics context
+    CGRect rect = CGRectMake((contextWidth - self.size.width) / 2.0, (contextHeight - self.size.height) / 2.0, self.size.width, self.size.height);
+    [self drawInRect:rect];
     
     UIImage *newImage = UIGraphicsGetImageFromCurrentImageContext();
+    
     UIGraphicsEndImageContext();
     
     return newImage;
