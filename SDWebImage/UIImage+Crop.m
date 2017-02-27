@@ -17,7 +17,7 @@
     CGFloat contextHeight = fmin(self.size.width, self.size.height);
     CGFloat contextCentreX = contextWidth / 2.0;
     CGFloat contextCentreY = contextHeight / 2.0;
-    CGFloat border = 0.0;
+    CGFloat border = 1.0;
     CGFloat arcRadius = (contextWidth / 2.0) - border;
     
     UIGraphicsBeginImageContextWithOptions(CGSizeMake(contextWidth, contextHeight), NO, self.scale);
