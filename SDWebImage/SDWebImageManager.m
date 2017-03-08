@@ -8,7 +8,6 @@
 
 #import "SDWebImageManager.h"
 #import <objc/message.h>
-#import "UIImage+Crop.h"
 
 @interface SDWebImageCombinedOperation : NSObject <SDWebImageOperation>
 
@@ -113,9 +112,17 @@
     }];
 }
 
+- (id<SDWebImageOperation>)downloadImageWithURL:(NSURL *)url
+                                        options:(SDWebImageOptions)options
+                                       progress:(SDWebImageDownloaderProgressBlock)progressBlock
+                                      completed:(SDWebImageCompletionWithFinishedBlock)completedBlock {
+    return [self downloadImageWithURL:url options:options progress:progressBlock transform:nil completed:completedBlock];
+}
+
 - (id <SDWebImageOperation>)downloadImageWithURL:(NSURL *)url
                                          options:(SDWebImageOptions)options
                                         progress:(SDWebImageDownloaderProgressBlock)progressBlock
+                                       transform:(SDImageTransformOperation *)transformOperation
                                        completed:(SDWebImageCompletionWithFinishedBlock)completedBlock {
     // Invoking this method without a completedBlock is pointless
     NSAssert(completedBlock != nil, @"If you mean to prefetch the image, use -[SDWebImagePrefetcher prefetchURLs] instead");
@@ -151,10 +158,8 @@
         [self.runningOperations addObject:operation];
     }
     NSString *key = [self cacheKeyForURL:url];
-
-    if (options & SDWebImageCircularCrop) {
-        key = [key stringByAppendingString:@"(circularCrop)"];
-    }
+    
+    if (transformOperation.keyBlock) key = transformOperation.keyBlock(key);
     
     operation.cacheOperation = [self.imageCache queryDiskCacheForKey:key done:^(UIImage *image, SDImageCacheType cacheType) {
         if (operation.isCancelled) {
@@ -223,22 +228,21 @@
                     }
                     
                     BOOL cacheOnDisk = !(options & SDWebImageCacheMemoryOnly);
-
+                    
                     if (options & SDWebImageRefreshCached && image && !downloadedImage) {
                         // Image refresh hit the NSURLCache cache, do not call the completion block
                     }
                     else if (downloadedImage && (!downloadedImage.images || (options & SDWebImageTransformAnimatedImage))
-                             && ([self.delegate respondsToSelector:@selector(imageManager:transformDownloadedImage:withURL:)] || (options & SDWebImageCircularCrop))) {
+                             && ([self.delegate respondsToSelector:@selector(imageManager:transformDownloadedImage:withURL:)] || transformOperation.transformBlock)) {
                         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
-                            UIImage *transformedImage;
+                            UIImage *transformedImage = nil;
                             
-                            if (options & SDWebImageCircularCrop) {
-                                transformedImage = [downloadedImage circularlyCroppedImage];
-                            }
-                            else {
+                            if (transformOperation.transformBlock) {
+                                transformedImage = transformOperation.transformBlock(downloadedImage);
+                            } else {
                                 transformedImage = [self.delegate imageManager:self transformDownloadedImage:downloadedImage withURL:url];
                             }
-
+                            
                             if (transformedImage && finished) {
                                 BOOL imageWasTransformed = ![transformedImage isEqual:downloadedImage];
                                 [self.imageCache storeImage:transformedImage recalculateFromImage:imageWasTransformed imageData:(imageWasTransformed ? nil : data) forKey:key toDisk:cacheOnDisk];

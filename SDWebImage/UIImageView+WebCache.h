@@ -145,6 +145,8 @@
  */
 - (void)sd_setImageWithURL:(NSURL *)url placeholderImage:(UIImage *)placeholder options:(SDWebImageOptions)options progress:(SDWebImageDownloaderProgressBlock)progressBlock completed:(SDWebImageCompletionBlock)completedBlock;
 
+- (void)sd_setImageWithURL:(NSURL *)url placeholderImage:(UIImage *)placeholder options:(SDWebImageOptions)options progress:(SDWebImageDownloaderProgressBlock)progressBlock transform:(SDImageTransformOperation *)transformOperation completed:(SDWebImageCompletionBlock)completedBlock;
+
 /**
  * Set the imageView `image` with an `url` and optionally a placeholder image.
  *

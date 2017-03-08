@@ -87,13 +87,7 @@ typedef NS_OPTIONS(NSUInteger, SDWebImageOptions) {
      * have the hand before setting the image (apply a filter or add it with cross-fade animation for instance)
      * Use this flag if you want to manually set the image in the completion when success
      */
-    SDWebImageAvoidAutoSetImage = 1 << 11,
-    
-    /**
-     * Creates a circular crop of the image after it is downloaded & before it is cached to disk/memory & set
-     * as the imageview's image.
-     */
-    SDWebImageCircularCrop = 1 << 12
+    SDWebImageAvoidAutoSetImage = 1 << 11
 };
 
 typedef void(^SDWebImageCompletionBlock)(UIImage *image, NSError *error, SDImageCacheType cacheType, NSURL *imageURL);
@@ -220,6 +214,12 @@ SDWebImageManager *manager = [SDWebImageManager sharedManager];
                                         progress:(SDWebImageDownloaderProgressBlock)progressBlock
                                        completed:(SDWebImageCompletionWithFinishedBlock)completedBlock;
 
+- (id <SDWebImageOperation>)downloadImageWithURL:(NSURL *)url
+                                         options:(SDWebImageOptions)options
+                                        progress:(SDWebImageDownloaderProgressBlock)progressBlock
+                                       transform:(SDImageTransformOperation *)transformOperation
+                                       completed:(SDWebImageCompletionWithFinishedBlock)completedBlock;
+
 /**
  * Saves image to cache for given URL
  *
@@ -282,7 +282,7 @@ SDWebImageManager *manager = [SDWebImageManager sharedManager];
 
 
 /**
- *Return the cache key for a given URL
+ * Return the cache key for a given URL
  */
 - (NSString *)cacheKeyForURL:(NSURL *)url;
 
